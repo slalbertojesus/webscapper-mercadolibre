@@ -22,8 +22,12 @@ func main() {
 	app := fiber.New(&fiber.Settings{
 		Views: engine,
 	})
+
 	app.Get("/home", func(c *fiber.Ctx) {
 		_ = c.Render("buscador", fiber.Map{})
+		if c.Fasthttp.Request.Header.Method == "POST" {
+			coso := c.FormValue("coso")
+		}
 	})
 
 	query := "tarjeta de video"
