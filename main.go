@@ -15,6 +15,13 @@ func errorHandling(err error) {
 	}
 }
 
+func ShowBuscadorForm(c *fiber.Ctx) {
+	if err := c.Render("buscador",
+		fiber.Map{}); err != nil {
+		c.Status(500).Send(err.Error())
+	}
+}
+
 func main() {
 
 	engine := html.New(".", ".html")
@@ -23,12 +30,7 @@ func main() {
 		Views: engine,
 	})
 
-	app.Get("/home", func(c *fiber.Ctx) {
-		_ = c.Render("buscador", fiber.Map{})
-		if c.Fasthttp.Request.Header.Method == "POST" {
-			coso := c.FormValue("coso")
-		}
-	})
+	app.Get("/buscador", ShowBuscadorForm)
 
 	query := "tarjeta de video"
 	mercadoLibreUrl := "https://listado.mercadolibre.com.mx/"
