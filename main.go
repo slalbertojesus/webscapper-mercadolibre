@@ -7,6 +7,7 @@ import "log"
 import "net/http"
 import "github.com/PuerkitoBio/goquery"
 import "github.com/gofiber/template/html"
+import "github.com/gofiber/fiber/middleware"
 
 func errorHandling(err error) {
 	if err != nil {
@@ -22,6 +23,12 @@ func ShowBuscadorForm(c *fiber.Ctx) {
 	}
 }
 
+func PostBuscadorForm(c *fiber.Ctx) {
+	query := c.FormValue("coso")
+	c.Send(query)
+	fmt.Println("Printing query:" + query)
+}
+
 func main() {
 
 	engine := html.New(".", ".html")
@@ -30,7 +37,12 @@ func main() {
 		Views: engine,
 	})
 
+	app.Use(middleware.Logger(os.Stdout))
+	app.Use(middleware.Logger("UTC"))
+	app.Use(middleware.Logger("15:04:05"))
+	app.Use(middleware.Logger("${time} ${method} ${path}"))
 	app.Get("/buscador", ShowBuscadorForm)
+	app.Post("/buscador", PostBuscadorForm)
 
 	query := "tarjeta de video"
 	mercadoLibreUrl := "https://listado.mercadolibre.com.mx/"
@@ -43,7 +55,6 @@ func main() {
 	fmt.Println(response.Body)
 	defer response.Body.Close()
 
-	// Create a goquery document from the HTTP response
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		log.Fatal("Error loading HTTP response body. ", err)
